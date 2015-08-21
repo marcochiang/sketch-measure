@@ -257,7 +257,7 @@ com.utom.extend({
 
             var textLayer = this.addText(this.page);
             textLayer.setTextColor(color);
-            textLayer.setFontSize(14);
+            textLayer.setFontSize(12);
             textLayer.setLineSpacing(16);
             textLayer.setFontPostscriptName("HelveticaNeue");
             if(center) textLayer.setTextAlignment(2);
@@ -421,8 +421,9 @@ com.utom.extend({
         if(!this.configs) return false;
 
         var styles = [
-            this.sharedLayerStyle("@Size / Layer", "#FF5500"),
-            this.sharedTextStyle("@Size / Text", "#FFFFFF", 1, true)
+            this.sharedLayerStyle("@Size / Layer", "#FF39D6"),
+            this.sharedTextStyle("@Size / Text", "#FF39D6", 1, true),
+            this.sharedLayerStyle("@Invisible / Layer", "#4A90E2", false)
         ];
 
         if (this.selection.count() < 1){
@@ -443,6 +444,7 @@ com.utom.extend({
         var distance = this.getDistance(frame);
         var layerStyle = styles[0];
         var textStyle = styles[1];
+        var invisibleStyle = styles[2];
 
         if (container) this.removeLayer(container);
 
@@ -450,11 +452,12 @@ com.utom.extend({
         container.setName(name);
 
         var shape = this.addShape(container);
-        shape.setStyle(layerStyle);
+        shape.setStyle(invisibleStyle);
         var textL = this.addText(container);
         textL.setStyle(textStyle);
 
         var line = shape.duplicate();
+        line.setStyle(layerStyle);
         var lineFrame = line.absoluteRect();
         line.setName("line");
         lineFrame.setWidth(frame.width);
@@ -462,13 +465,23 @@ com.utom.extend({
         lineFrame.setX( frame.x );
 
         var start = shape.duplicate();
+        start.setStyle(layerStyle);
         var startFrame = start.absoluteRect();
         start.setName("start");
         startFrame.setWidth(1);
         startFrame.setHeight(5);
         startFrame.setX( frame.x );
 
+        var middle = shape.duplicate();
+        middle.setStyle(layerStyle);
+        var middleFrame = middle.absoluteRect();
+        middle.setName("middle");
+        middleFrame.setWidth(1);
+        middleFrame.setHeight(5);
+        middleFrame.setX( this.mathHalf(frame.x + frame.x + frame.width - 1) );
+
         var end = shape.duplicate();
+        end.setStyle(layerStyle);
         var endFrame = end.absoluteRect();
         end.setName("end");
         endFrame.setWidth(1);
@@ -493,10 +506,10 @@ com.utom.extend({
         var labelFrame = label.absoluteRect();
         var labelX;
         var labelY;
-        var gapX;
-        var gapY;
-        var gapWidth;
-        var gapHeight;
+        // var gapX;
+        // var gapY;
+        // var gapWidth;
+        // var gapHeight;
         var labelWidth = Math.round( textFrame.width() + 8 );
         var labelHeight = Math.round( textFrame.height() + 6 );
 
@@ -504,43 +517,46 @@ com.utom.extend({
         labelFrame.setWidth( labelWidth );
         labelFrame.setHeight( labelHeight );
 
-        var gap = shape.duplicate();
-        var gapFrame = gap.absoluteRect();
-        gap.setName("gap");
-        gap.setRotation(45);
-        gap.flatten();
-        gapFrame.setWidth(8);
-        gapFrame.setHeight(8);
-        gapFrame = gap.absoluteRect();
-        gapWidth = Math.round( gapFrame.width() );
-        gapHeight = Math.round( gapFrame.height() );
+        // var gap = shape.duplicate();
+        // var gapFrame = gap.absoluteRect();
+        // gap.setName("gap");
+        // gap.setRotation(45);
+        // gap.flatten();
+        // gapFrame.setWidth(8);
+        // gapFrame.setHeight(8);
+        // gapFrame = gap.absoluteRect();
+        // gapWidth = Math.round( gapFrame.width() );
+        // gapHeight = Math.round( gapFrame.height() );
 
         labelX = frame.x + this.mathHalf(frame.width) - this.mathHalf(labelWidth);
-        gapX = labelX + this.mathHalf(labelWidth) - this.mathHalf(gapWidth);
+        // gapX = labelX + this.mathHalf(labelWidth) - this.mathHalf(gapWidth);
 
         if(distance[0] < distance[2] && distance[2] >= 50 && !isCenter){
             lineFrame.setY( frame.y + frame.height + 3 );
             startFrame.setY( frame.y + frame.height + 1 );
+            middleFrame.setY( frame.y + frame.height + 3 );
             endFrame.setY( frame.y + frame.height + 1 );
         }
         else if( distance[0] >= 50 && !isCenter ){
             lineFrame.setY( frame.y - 4 );
             startFrame.setY( frame.y - 6 );
+            middleFrame.setY( frame.y - 4 );
             endFrame.setY( frame.y - 6 );
         }
         else{
             lineFrame.setY( frame.y + this.mathHalf(frame.height) );
             startFrame.setY( frame.y + this.mathHalf(frame.height) - 2 );
+            middleFrame.setY( frame.y + this.mathHalf(frame.height) );
             endFrame.setY( frame.y + this.mathHalf(frame.height) - 2 );
         }
 
         var lineY = lineFrame.y();
-        labelY = lineY - this.mathHalf(labelHeight);
-        gapY = labelY + this.mathHalf(labelHeight) - this.mathHalf(gapHeight);
+        labelY = lineY - this.mathHalf(labelHeight) + 12;
+        // gapY = labelY + this.mathHalf(labelHeight) - this.mathHalf(gapHeight);
 
         if( (labelWidth + 10) > frame.width ){
             labelY = (distance[0] < distance[2])? lineY + 6: lineY - labelHeight - 5;
-            gapY = (distance[0] < distance[2])? lineY + 3: lineY - 10;
+            // gapY = (distance[0] < distance[2])? lineY + 3: lineY - 10;
         }
 
         var aFrame = this.getFrame(this.current);
@@ -549,8 +565,8 @@ com.utom.extend({
 
         labelFrame.setX(labelX);
         labelFrame.setY(labelY);
-        gapFrame.setX(gapX);
-        gapFrame.setY(gapY);
+        // gapFrame.setX(gapX);
+        // gapFrame.setY(gapY);
         textFrame.setX(labelX + 4);
         textFrame.setY(labelY + 3);
 
@@ -570,6 +586,7 @@ com.utom.extend({
         var distance = this.getDistance(frame);
         var layerStyle = styles[0];
         var textStyle = styles[1];
+        var invisibleStyle = styles[2];
 
         if (container) this.removeLayer(container);
 
@@ -577,11 +594,13 @@ com.utom.extend({
         container.setName(name);
 
         var shape = this.addShape(container);
-        shape.setStyle(layerStyle);
+        shape.setStyle(invisibleStyle);
         var textL = this.addText(container);
         textL.setStyle(textStyle);
 
+
         var line = shape.duplicate();
+        line.setStyle(layerStyle);
         var lineFrame = line.absoluteRect();
         line.setName("line");
         lineFrame.setWidth(1);
@@ -589,13 +608,23 @@ com.utom.extend({
         lineFrame.setY( frame.y );
 
         var start = shape.duplicate();
+        start.setStyle(layerStyle);
         var startFrame = start.absoluteRect();
         start.setName("start");
         startFrame.setWidth(5);
         startFrame.setHeight(1);
         startFrame.setY( frame.y );
 
+        var middle = shape.duplicate();
+        middle.setStyle(layerStyle);
+        var middleFrame = middle.absoluteRect();
+        middle.setName("middle");
+        middleFrame.setWidth(5);
+        middleFrame.setHeight(1);
+        middleFrame.setY( this.mathHalf(frame.y + frame.y + frame.height - 1) );
+
         var end = shape.duplicate();
+        end.setStyle(layerStyle);
         var endFrame = end.absoluteRect();
         end.setName("end");
         endFrame.setWidth(5);
@@ -617,13 +646,14 @@ com.utom.extend({
 
         var textFrame = text.absoluteRect();
         var label = shape.duplicate();
+        label.setStyle(invisibleStyle);
         var labelFrame = label.absoluteRect();
         var labelX;
         var labelY;
-        var gapX;
-        var gapY;
-        var gapWidth;
-        var gapHeight;
+        // var gapX;
+        // var gapY;
+        // var gapWidth;
+        // var gapHeight;
         var labelWidth = Math.round( textFrame.width() + 8 );
         var labelHeight = Math.round( textFrame.height() + 6 );
 
@@ -631,43 +661,46 @@ com.utom.extend({
         labelFrame.setWidth( labelWidth );
         labelFrame.setHeight( labelHeight );
 
-        var gap = shape.duplicate();
-        var gapFrame = gap.absoluteRect();
-        gap.setName("gap");
-        gap.setRotation(45);
-        gap.flatten();
-        gapFrame.setWidth(8);
-        gapFrame.setHeight(8);
-        gapFrame = gap.absoluteRect();
-        gapWidth = Math.round( gapFrame.width() );
-        gapHeight = Math.round( gapFrame.height() );
+        // var gap = shape.duplicate();
+        // var gapFrame = gap.absoluteRect();
+        // gap.setName("gap");
+        // gap.setRotation(45);
+        // gap.flatten();
+        // gapFrame.setWidth(8);
+        // gapFrame.setHeight(8);
+        // gapFrame = gap.absoluteRect();
+        // gapWidth = Math.round( gapFrame.width() );
+        // gapHeight = Math.round( gapFrame.height() );
 
         labelY = frame.y + this.mathHalf(frame.height) - this.mathHalf(labelHeight);
-        gapY = labelY + this.mathHalf(labelHeight) - this.mathHalf(gapHeight);
+        // gapY = labelY + this.mathHalf(labelHeight) - this.mathHalf(gapHeight);
 
         if (distance[1] < distance[3] && distance[3] >= 50 && !isCenter) {
             lineFrame.setX( frame.x - 4 );
             startFrame.setX( frame.x - 6 );
+            middleFrame.setX( frame.x - 4 );
             endFrame.setX( frame.x - 6 );
         }
         else if( distance[1] >= 50 && !isCenter){
             lineFrame.setX( frame.x + frame.width + 3 );
             startFrame.setX( frame.x + frame.width + 1 );
+            middleFrame.setX( frame.x + frame.width + 3 );
             endFrame.setX( frame.x + frame.width + 1 );
         }
         else{
             lineFrame.setX( frame.x + this.mathHalf(frame.width) );
             startFrame.setX( frame.x + this.mathHalf(frame.width) - 2 );
+            middleFrame.setX( frame.x + this.mathHalf(frame.width) );
             endFrame.setX( frame.x + this.mathHalf(frame.width) - 2 );
         }
 
         var lineX = lineFrame.x();
-        labelX = lineX - this.mathHalf(labelWidth);
-        gapX = labelX + this.mathHalf(labelWidth) - this.mathHalf(gapWidth);
+        labelX = lineX - this.mathHalf(labelWidth) + 22;
+        // gapX = labelX + this.mathHalf(labelWidth) - this.mathHalf(gapWidth);
 
         if( (labelHeight + 10) > frame.height ){
             labelX = (distance[1] < distance[3])? lineX - labelWidth - 5 : lineX + 6;
-            gapX = (distance[1] < distance[3])? lineX - 10 : lineX + 3;
+            // gapX = (distance[1] < distance[3])? lineX - 10 : lineX + 3;
         }
 
         var aFrame = this.getFrame(this.current);
@@ -676,8 +709,8 @@ com.utom.extend({
 
         labelFrame.setX(labelX);
         labelFrame.setY(labelY);
-        gapFrame.setX(gapX);
-        gapFrame.setY(gapY);
+        // gapFrame.setX(gapX);
+        // gapFrame.setY(gapY);
         textFrame.setX(labelX + 4);
         textFrame.setY(labelY + 3);
 
@@ -695,8 +728,9 @@ com.utom.extend({
         if(!this.configs) return false;
 
         var styles = styles || [
-            this.sharedLayerStyle("@Spacing / Layer", "#50E3C2"),
-            this.sharedTextStyle("@Spacing / Text", "#FFFFFF", 1, true)
+            this.sharedLayerStyle("@Spacing / Layer", "#FF39D6"),
+            this.sharedTextStyle("@Spacing / Text", "#FF39D6", 1, true),
+            this.sharedLayerStyle("@Invisible / Layer", "#FFFFFF", 0)
         ];
 
         if (this.selection.count() < 1 || this.selection.count() > 2){
@@ -845,7 +879,7 @@ com.utom.extend({
         var frame = this.getFrame(layer);
         var name = "OVERLAYER#" + layer.objectID();
         var container = this.find(name);
-        var layerStyle = this.sharedLayerStyle("@Overlayer / Layer", "#FF5500", .3);
+        var layerStyle = this.sharedLayerStyle("@Overlayer / Layer", "#FF39D6", .25);
 
         if (container) this.removeLayer(container);
 
@@ -895,22 +929,22 @@ com.utom.extend({
         var container = text.parentGroup();
         var shape;
         var label;
-        var gap;
-        var gapFrame;
+        // var gap;
+        // var gapFrame;
         var labelFrame;
 
         if(/NOTE\#|LABEL\#|TYPOGRAPHY\#|PROPERTY\#/.exec(container.name())){
             label = this.find('label', container);
             labelFrame = this.getFrame(label);
-            gap = this.find('gap', container);
-            if(gap){
-                gapFrame = this.getFrame(gap);
-                var old = {
-                    ly: labelFrame.y,
-                    lh: labelFrame.height,
-                    gy: gapFrame.y
-                }
-            }
+            // gap = this.find('gap', container);
+            // if(gap){
+            //     gapFrame = this.getFrame(gap);
+            //     var old = {
+            //         ly: labelFrame.y,
+            //         lh: labelFrame.height,
+            //         gy: gapFrame.y
+            //     }
+            // }
 
         }
         else{
@@ -919,11 +953,13 @@ com.utom.extend({
 
             var styles = styles || [
                 this.sharedLayerStyleBorder(this.sharedLayerStyle("@NOTE / Layer", "#FFFCDC"), "#CCCCCC"),
-                this.sharedTextStyle("@NOTE / Text", "#555555")
+                this.sharedTextStyle("@NOTE / Text", "#FF39D6"),
+                this.sharedLayerStyle("@Invisible / Layer", "#FFFFFF", 0)
             ];
 
             var layerStyle = styles[0];
             var textStyle = styles[1];
+            var invisibleStyle = styles[2];
 
             if (container) this.removeLayer(container);
 
@@ -931,7 +967,15 @@ com.utom.extend({
             container.setName(name);
 
             shape = this.addShape(container);
-            shape.setStyle(layerStyle);
+            shape.setStyle(invisibleStyle);
+
+            var line = shape.duplicate();
+            line.setStyle(layerStyle);
+            var lineFrame = line.absoluteRect();
+            line.setName("line");
+            lineFrame.setWidth(1);
+            lineFrame.setHeight(100);
+            lineFrame.setY( textFrame.y );
 
             label = shape.duplicate();
             label.setName("label");
@@ -954,35 +998,35 @@ com.utom.extend({
         labelFrame.setWidth(textFrameAbsoluteRect.width() + 8);
         labelFrame.setHeight(textFrameAbsoluteRect.height() + 6);
 
-        if(position != undefined){
-            gap = shape.duplicate();
+        // if(position != undefined){
+        //     gap = shape.duplicate();
 
-            var gapFrame = gap.absoluteRect();
-            gap.setName("gap");
-            gap.setRotation(45);
-            gap.flatten();
-            gapFrame.setWidth(8);
-            gapFrame.setHeight(8);
-            gapFrame = gap.absoluteRect();
-            gapWidth = Math.round( gapFrame.width() );
-            gapHeight = Math.round( gapFrame.height() );
+        //     var gapFrame = gap.absoluteRect();
+        //     gap.setName("gap");
+        //     gap.setRotation(45);
+        //     gap.flatten();
+        //     gapFrame.setWidth(8);
+        //     gapFrame.setHeight(8);
+        //     gapFrame = gap.absoluteRect();
+        //     gapWidth = Math.round( gapFrame.width() );
+        //     gapHeight = Math.round( gapFrame.height() );
 
-            var gapX = labelFrame.x() + this.mathHalf(labelFrame.width() - gapFrame.width());
-            var gapY = labelFrame.y() + this.mathHalf(labelFrame.height() - gapFrame.height());
+        //     var gapX = labelFrame.x() + this.mathHalf(labelFrame.width() - gapFrame.width());
+        //     var gapY = labelFrame.y() + this.mathHalf(labelFrame.height() - gapFrame.height());
 
-            gapX = (position === 1)? labelFrame.x() - 4: gapX;
-            gapX = (position === 3)? labelFrame.x() + labelFrame.width() - 4: gapX;
+        //     gapX = (position === 1)? labelFrame.x() - 4: gapX;
+        //     gapX = (position === 3)? labelFrame.x() + labelFrame.width() - 4: gapX;
 
-            gapY = (position === 0)? labelFrame.y() + labelFrame.height() - 4: gapY;
-            gapY = (position === 2)? labelFrame.y() - 4: gapY;
+        //     gapY = (position === 0)? labelFrame.y() + labelFrame.height() - 4: gapY;
+        //     gapY = (position === 2)? labelFrame.y() - 4: gapY;
 
-            gapFrame.setX(gapX);
-            gapFrame.setY(gapY);
-        }
-        else if(old && old.ly < old.gy){
-            gapFrame = gap.absoluteRect();
-            gapFrame.setY(old.gy - (old.lh - labelFrame.height()));
-        }
+        //     gapFrame.setX(gapX);
+        //     gapFrame.setY(gapY);
+        // }
+        // else if(old && old.ly < old.gy){
+        //     gapFrame = gap.absoluteRect();
+        //     gapFrame.setY(old.gy - (old.lh - labelFrame.height()));
+        // }
 
         this.removeLayer(shape);
 
@@ -1110,8 +1154,9 @@ com.utom.extend({
         var layer = layer || this.selection[0];
 
         var styles = [
-            this.sharedLayerStyle("@Property / Layer", "#F5A623"),
-            this.sharedTextStyle("@Property / Text", "#FFFFFF")
+            this.sharedLayerStyle("@Property / Layer", "#FF39D6", 0),
+            this.sharedTextStyle("@Property / Text", "#FF39D6"),
+            this.sharedLayerStyle("@Invisible / Layer", "#FFFFFF", 0)
         ];
 
         var propertyConfigs = this.propertyDialog();
@@ -1338,8 +1383,9 @@ com.utom.extend({
         if(!this.configs) return false;
 
         var styles = styles || [
-            this.sharedLayerStyle("@Lite / Layer", "#9013FE"),
-            this.sharedTextStyle("@Lite / Text", "#FFFFFF")
+            this.sharedLayerStyle("@Lite / Layer", "#FF39D6"),
+            this.sharedTextStyle("@Lite / Text", "#FF39D6"),
+            this.sharedLayerStyle("@Invisible / Layer", "#FFFFFF", 0)
         ];
 
         if (this.selection.count() != 1){
@@ -1359,8 +1405,9 @@ com.utom.extend({
         if(!this.configs) return false;
 
         var styles = styles || [
-            this.sharedLayerStyle("@Lite / Layer", "#9013FE"),
-            this.sharedTextStyle("@Lite / Text", "#FFFFFF")
+            this.sharedLayerStyle("@Lite / Layer", "#FF39D6"),
+            this.sharedTextStyle("@Lite / Text", "#FF39D6"),
+            this.sharedLayerStyle("@Invisible / Layer", "#FFFFFF", 0)
         ];
 
         if (this.selection.count() != 1){
@@ -1380,8 +1427,9 @@ com.utom.extend({
         if(!this.configs) return false;
 
         var styles = styles || [
-            this.sharedLayerStyle("@Lite / Layer", "#9013FE"),
-            this.sharedTextStyle("@Lite / Text", "#FFFFFF")
+            this.sharedLayerStyle("@Lite / Layer", "#FF39D6"),
+            this.sharedTextStyle("@Lite / Text", "#FF39D6"),
+            this.sharedLayerStyle("@Invisible / Layer", "#FFFFFF", 0)
         ];
 
         if (this.selection.count() != 1){
